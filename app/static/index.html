@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>정보개발이</title>
+<style>
+  :root {
+    --primary: #7B5CF0;
+    --primary-strong: #6B46E5;
+    --primary-soft: #EEEAFE;
+    --primary-softer: #F5F2FE;
+    --bg: #F6F5FB;
+    --surface: #FFFFFF;
+    --surface-2: #FBFAFF;
+    --text: #1A1D29;
+    --sub: #8A8FA3;
+    --border: #ECEAF4;
+    --border-strong: #DED9EE;
+    --ok: #12B886;
+    --danger: #E8590C;
+    --shadow-sm: 0 1px 2px rgba(26,29,41,.05);
+    --shadow-md: 0 2px 4px rgba(26,29,41,.04), 0 12px 28px -14px rgba(123,92,240,.22);
+    --shadow-lg: 0 8px 20px -6px rgba(123,92,240,.28);
+    --radius: 20px;
+    --font: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+            "Malgun Gothic", "맑은 고딕", "Noto Sans KR", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #9B85F7;
+      --primary-strong: #8B6EF5;
+      --primary-soft: #2A2540;
+      --primary-softer: #201C30;
+      --bg: #14131C;
+      --surface: #1E1C2A;
+      --surface-2: #24212F;
+      --text: #ECEAF5;
+      --sub: #9A9AAE;
+      --border: #2C2A3A;
+      --border-strong: #3A3750;
+      --shadow-md: 0 2px 4px rgba(0,0,0,.2), 0 12px 28px -14px rgba(0,0,0,.5);
+      --shadow-lg: 0 8px 20px -6px rgba(0,0,0,.45);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }   /* class 의 display 보다 우선 (빈화면 숨김 보장) */
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+  }
+
+  .app {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+  /* 상단 은은한 광원 → 입체감 */
+  .app::before {
+    content: "";
+    position: fixed;
+    top: -180px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 420px;
+    background: radial-gradient(closest-side, rgba(123,92,240,.16), transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── 헤더 ── */
+  header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: linear-gradient(135deg, #8E74F6, var(--primary-strong));
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-lg);
+    flex-shrink: 0;
+  }
+  .logo svg { width: 20px; height: 20px; }
+  .brand { display: flex; flex-direction: column; line-height: 1.25; }
+  .brand b { font-size: 16px; font-weight: 700; }
+  .brand span { font-size: 12px; color: var(--sub); }
+  .status {
+    margin-left: auto; display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 600; color: var(--sub);
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sub); }
+  .status.on   .dot { background: var(--ok);     box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 20%, transparent); }
+  .status.off  .dot { background: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 20%, transparent); }
+  .status.wait .dot { background: var(--primary); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+  /* ── 대화 영역 ── */
+  .scroll { position: relative; z-index: 1; flex: 1; overflow-y: auto; scroll-behavior: smooth; }
+  .thread { display: flex; flex-direction: column; gap: 18px; padding: 24px 20px 8px; }
+
+  /* 빈 화면 */
+  .welcome {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 32px 24px; gap: 10px;
+  }
+  .welcome .logo { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 8px; }
+  .welcome .logo svg { width: 32px; height: 32px; }
+  .welcome h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
+  .welcome p { color: var(--sub); font-size: 15px; max-width: 30ch; text-wrap: balance; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; max-width: 560px; }
+  .chip {
+    font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 11px 16px; border-radius: 14px; cursor: pointer;
+    box-shadow: var(--shadow-sm); transition: transform .14s, border-color .14s, box-shadow .14s;
+  }
+  .chip:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: var(--shadow-md); }
+  .chip:active { transform: translateY(0); }
+
+  /* 메시지 행 */
+  .row { display: flex; gap: 10px; align-items: flex-end; animation: rise .32s cubic-bezier(.2,.7,.3,1) both; }
+  .row.user { flex-direction: row-reverse; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #8E74F6, var(--primary-strong));
+    display: grid; place-items: center; box-shadow: var(--shadow-lg);
+  }
+  .avatar svg { width: 17px; height: 17px; }
+
+  .bubble {
+    max-width: 76%; padding: 13px 16px; font-size: 15.5px; line-height: 1.62;
+    border-radius: 18px; white-space: pre-wrap; word-break: break-word;
+  }
+  .row.ai .bubble {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-bottom-left-radius: 6px;
+    box-shadow: var(--shadow-md);
+  }
+  .row.user .bubble {
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    color: #fff; border-bottom-right-radius: 6px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* 출처 칩 */
+  .sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; padding-top: 11px; border-top: 1px dashed var(--border-strong); }
+  .src {
+    font-size: 12px; font-weight: 600; color: var(--primary-strong);
+    background: var(--primary-soft); padding: 4px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  @media (prefers-color-scheme: dark) { .src { color: #C9BCF9; } }
+
+  /* 답변 본문의 인용 칩 [출처 N] */
+  .cite {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 19px; height: 19px; padding: 0 5px; margin: 0 2px; vertical-align: 1px;
+    font-family: inherit; font-size: 11.5px; font-weight: 700; line-height: 1; color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    border: 0; border-radius: 6px; cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: transform .12s, filter .12s;
+  }
+  .cite:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+  /* 참조 카드 목록 */
+  .refs { margin-top: 13px; padding-top: 12px; border-top: 1px dashed var(--border-strong);
+          display: flex; flex-direction: column; gap: 8px; }
+  .refs-title { font-size: 12px; font-weight: 700; color: var(--sub); }
+  .ref { border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2);
+         overflow: hidden; transition: border-color .15s, box-shadow .2s; }
+  .ref.open { border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); }
+  .ref.flash { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent); }
+  .ref-head { display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 12px;
+              background: transparent; border: 0; cursor: pointer; font-family: inherit;
+              text-align: left; color: var(--text); }
+  .ref-num { flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; background: var(--primary);
+             color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+  .ref-t { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600;
+           overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ref-badge { flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--primary-strong);
+               background: var(--primary-soft); padding: 3px 9px; border-radius: 999px; }
+  .ref-chevron { flex-shrink: 0; color: var(--sub); font-size: 11px; transition: transform .18s; }
+  .ref.open .ref-chevron { transform: rotate(180deg); }
+  .ref-body { display: none; padding: 2px 14px 13px 41px; font-size: 13px; line-height: 1.65;
+              color: var(--sub); white-space: pre-wrap; word-break: break-word; }
+  .ref.open .ref-body { display: block; }
+  .ref-actions { margin-top: 10px; }
+  .ref-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700;
+              color: var(--primary-strong); text-decoration: none; background: var(--primary-soft);
+              padding: 6px 12px; border-radius: 10px; }
+  .ref-link:hover { filter: brightness(.97); }
+
+  /* 로딩 말풍선 */
+  .loading .bubble { display: flex; align-items: center; gap: 11px; color: var(--sub); font-weight: 500; }
+  .beat { display: inline-flex; gap: 4px; }
+  .beat i { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); display: inline-block; animation: beat 1s infinite ease-in-out; }
+  .beat i:nth-child(2){ animation-delay: .16s; } .beat i:nth-child(3){ animation-delay: .32s; }
+  @keyframes beat { 0%,80%,100%{ transform: scale(.6); opacity:.4 } 40%{ transform: scale(1); opacity:1 } }
+  .loadmsg { transition: opacity .25s; }
+
+  /* ── 입력 독 ── */
+  .dock { position: relative; z-index: 2; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .composer {
+    display: flex; align-items: flex-end; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: 24px; padding: 8px 8px 8px 18px;
+    box-shadow: var(--shadow-md); transition: border-color .15s, box-shadow .15s;
+  }
+  .composer:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent), var(--shadow-md); }
+  textarea {
+    flex: 1; border: 0; outline: 0; resize: none; background: transparent;
+    font-family: inherit; font-size: 15.5px; line-height: 1.5; color: var(--text);
+    max-height: 160px; padding: 9px 0;
+  }
+  textarea::placeholder { color: var(--sub); }
+  .send {
+    width: 42px; height: 42px; border: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    display: grid; place-items: center; box-shadow: var(--shadow-lg);
+    transition: transform .14s, filter .14s, opacity .14s;
+  }
+  .send svg { width: 20px; height: 20px; }
+  .send:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
+  .send:active:not(:disabled) { transform: translateY(0); }
+  .send:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .hint { text-align: center; font-size: 11.5px; color: var(--sub); margin-top: 9px; }
+
+  .retry {
+    margin-top: 10px; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--primary-strong);
+    background: var(--primary-soft); border: 0; padding: 8px 14px; border-radius: 12px; cursor: pointer;
+  }
+  .retry:hover { filter: brightness(.97); }
+
+  .scroll::-webkit-scrollbar { width: 10px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; border: 3px solid var(--bg); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto; } }
+  @media (max-width: 560px) { .bubble { max-width: 84%; } .welcome h1 { font-size: 23px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5l1.9 5.2a4 4 0 0 0 2.4 2.4l5.2 1.9-5.2 1.9a4 4 0 0 0-2.4 2.4L12 21.5l-1.9-5.2a4 4 0 0 0-2.4-2.4L2.5 12l5.2-1.9a4 4 0 0 0 2.4-2.4L12 2.5z" fill="#fff"/></svg>
+    </div>
+    <div class="brand">
+      <b>정보개발이</b>
+      <span>문서·뉴스 기반으로 답해드려요</span>
+    </div>
+    <div class="status wait" id="status"><span class="dot"></span><span id="statusText">연결 확인 중</span></div>
+  </header>
+
+  <div class="scroll" id="scroll">
+    <!-- 빈 화면 -->
+    <div class="welcome" id="welcome">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5l1.9 5.2a4 4 0 0 0 2.4 2.4l5.2 1.9-5.2 1.9a4 4 0 0 0-2.4 2.4L12 21.5l-1.9-5.2a4 4 0 0 0-2.4-2.4L2.5 12l5.2-1.9a4 4 0 0 0 2.4-2.4L12 2.5z" fill="#fff"/></svg>
+      </div>
+      <h1>무엇이든 물어보세요</h1>
+      <p>사내 문서와 최신 뉴스를 찾아 근거와 함께 답해드려요.</p>
+      <div class="chips" id="chips">
+        <button class="chip">이니시스 올해 상반기 매출액 알려줘</button>
+        <button class="chip">오늘 주요 이슈 알려줘</button>
+        <button class="chip">오늘 날씨 알려줘</button>
+        <button class="chip">현재 가장 전망이 좋은 주식 알려줘</button>
+      </div>
+    </div>
+    <div class="thread" id="thread" hidden></div>
+  </div>
+
+  <div class="dock">
+    <div class="composer">
+      <textarea id="input" rows="1" placeholder="메시지를 입력하세요" autocomplete="off"></textarea>
+      <button class="send" id="send" aria-label="보내기" disabled>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l15-7-6 7 6 7-15-7z" fill="#fff"/></svg>
+      </button>
+    </div>
+    <div class="hint">AI가 만든 답변이라 실제와 다를 수 있어요. 중요한 내용은 출처를 확인해 주세요.</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var API = "";                       // 동일 출처 (서버가 이 페이지를 서빙)
+  var scroll = document.getElementById("scroll");
+  var thread = document.getElementById("thread");
+  var welcome = document.getElementById("welcome");
+  var input = document.getElementById("input");
+  var sendBtn = document.getElementById("send");
+  var statusEl = document.getElementById("status");
+  var statusText = document.getElementById("statusText");
+  var busy = false;
+  var lastQuestion = null;
+
+  var LOADING_MSGS = [
+    "질문을 이해하고 있어요",
+    "관련 자료를 찾고 있어요",
+    "문서를 살펴보는 중이에요",
+    "답변을 정리하고 있어요"
+  ];
+
+  function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
+  function toBottom(){ requestAnimationFrame(function(){ scroll.scrollTop = scroll.scrollHeight; }); }
+
+  var AI_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5l1.9 5.2a4 4 0 0 0 2.4 2.4l5.2 1.9-5.2 1.9a4 4 0 0 0-2.4 2.4L12 21.5l-1.9-5.2a4 4 0 0 0-2.4-2.4L2.5 12l5.2-1.9a4 4 0 0 0 2.4-2.4L12 2.5z" fill="#fff"/></svg>';
+
+  function startThread(){ if (!welcome.hidden){ welcome.hidden = true; thread.hidden = false; } }
+
+  function addUser(text){
+    startThread();
+    var row = document.createElement("div");
+    row.className = "row user";
+    row.innerHTML = '<div class="bubble">' + esc(text) + '</div>';
+    thread.appendChild(row); toBottom();
+  }
+
+  // 출처 뱃지(소스·카테고리) / 제목
+  function refBadge(s){
+    if (s.source) return s.category ? (s.source + " · " + s.category) : s.source;
+    var t = (s.table || "").toUpperCase();
+    if (t === "NEWS_RSS") return "뉴스";
+    if (t === "MMS_TEST_TB") return "사내 공지";
+    if (s.db === "file") return "문서";
+    return s.table || "자료";
+  }
+  function refTitle(s){ return s.title || refBadge(s); }
+
+  var LINK_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M21 3l-9 9"/><path d="M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>';
+
+  // 답변 본문의 [출처 N]/[참조 N] → 클릭 가능한 인용 칩
+  function renderAnswerHTML(text, n){
+    return esc(text).replace(/\[(?:출처|참조)\s*(\d+)\]/g, function(m, d){
+      var i = parseInt(d, 10);
+      return (i >= 1 && i <= n) ? '<button class="cite" data-n="' + i + '">' + i + '</button>' : m;
+    });
+  }
+
+  // 참조 카드: 클릭 시 참조된 내용 펼침 + 원문 링크
+  function renderRefs(sources){
+    if (!sources || !sources.length) return "";
+    var items = sources.map(function(s, idx){
+      var n = idx + 1;
+      var link = s.url
+        ? '<a class="ref-link" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + LINK_SVG + ' 원문 보기</a>'
+        : '';
+      return '<div class="ref" data-ref="' + n + '">' +
+        '<button class="ref-head" type="button">' +
+          '<span class="ref-num">' + n + '</span>' +
+          '<span class="ref-t">' + esc(refTitle(s)) + '</span>' +
+          '<span class="ref-badge">' + esc(refBadge(s)) + '</span>' +
+          '<span class="ref-chevron" aria-hidden="true">▾</span>' +
+        '</button>' +
+        '<div class="ref-body">' + esc(s.snippet || "(내용 없음)") +
+          (link ? '<div class="ref-actions">' + link + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join("");
+    return '<div class="refs"><div class="refs-title">참조한 자료 ' + sources.length + '건</div>' + items + '</div>';
+  }
+
+  function openRef(row, n){
+    var ref = row.querySelector('.ref[data-ref="' + n + '"]');
+    if (!ref) return;
+    ref.classList.add("open");
+    ref.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    ref.classList.add("flash");
+    setTimeout(function(){ ref.classList.remove("flash"); }, 1200);
+  }
+
+  function addAI(answer, sources){
+    var row = document.createElement("div");
+    row.className = "row ai";
+    var n = (sources || []).length;
+    row.innerHTML = '<div class="avatar" aria-hidden="true">' + AI_SVG + '</div>' +
+      '<div class="bubble"><div class="ans">' + renderAnswerHTML(answer, n) + '</div>' +
+      renderRefs(sources) + '</div>';
+    // 인용칩 클릭 → 해당 참조 펼치고 이동 / 참조 헤더 클릭 → 펼침 토글
+    row.addEventListener("click", function(e){
+      var cite = e.target.closest(".cite");
+      if (cite){ openRef(row, cite.getAttribute("data-n")); return; }
+      var head = e.target.closest(".ref-head");
+      if (head){ head.parentElement.classList.toggle("open"); }
+    });
+    thread.appendChild(row); toBottom();
+  }
+
+  // 로딩 말풍선 + 회전 메시지
+  function addLoading(){
+    startThread();
+    var row = document.createElement("div");
+    row.className = "row ai loading";
+    row.innerHTML = '<div class="avatar" aria-hidden="true">' + AI_SVG + '</div>' +
+      '<div class="bubble"><span class="beat"><i></i><i></i><i></i></span>' +
+      '<span class="loadmsg">' + LOADING_MSGS[0] + '</span></div>';
+    thread.appendChild(row); toBottom();
+    var el = row.querySelector(".loadmsg"), i = 0;
+    var timer = setInterval(function(){
+      i = (i + 1) % LOADING_MSGS.length;
+      el.style.opacity = 0;
+      setTimeout(function(){ el.textContent = LOADING_MSGS[i]; el.style.opacity = 1; }, 220);
+    }, 2200);
+    return { remove: function(){ clearInterval(timer); row.remove(); } };
+  }
+
+  function addError(text){
+    var row = document.createElement("div");
+    row.className = "row ai";
+    row.innerHTML = '<div class="avatar" aria-hidden="true">' + AI_SVG + '</div>' +
+      '<div class="bubble">' + esc(text) +
+      '<div><button class="retry" id="retryBtn">다시 시도</button></div></div>';
+    thread.appendChild(row); toBottom();
+    var b = row.querySelector("#retryBtn");
+    b.addEventListener("click", function(){ row.remove(); if (lastQuestion) send(lastQuestion); });
+  }
+
+  function setBusy(v){
+    busy = v;
+    sendBtn.disabled = v || input.value.trim() === "";
+    input.disabled = v;
+  }
+
+  async function health(){
+    statusEl.className = "status wait"; statusText.textContent = "연결 확인 중";
+    try {
+      var r = await fetch(API + "/health", { cache: "no-store" });
+      var j = await r.json();
+      if (j && j.status === "ok"){ statusEl.className = "status on"; statusText.textContent = "연결됨"; return true; }
+    } catch (e) {}
+    statusEl.className = "status off"; statusText.textContent = "연결 끊김";
+    return false;
+  }
+
+  // 스트리밍 수신: 토큰이 도착하는 대로 답변을 그려준다(Claude/Gemini식). 체감 지연↓
+  async function send(text){
+    text = (text || "").trim();
+    if (!text || busy) return;
+    lastQuestion = text;
+    addUser(text);
+    input.value = ""; input.style.height = "auto";
+    setBusy(true);
+    var loader = addLoading();
+
+    // 하드 타임아웃(X) → '무응답 유휴' 타임아웃: 데이터가 흐르는 한 계속 기다린다.
+    // 데이터가 120초 동안 전혀 안 오면(=백엔드 정지)에만 중단.
+    var IDLE_MS = 120000;
+    var ctrl = new AbortController();
+    var idle = setTimeout(function(){ ctrl.abort(); }, IDLE_MS);
+    function bump(){ clearTimeout(idle); idle = setTimeout(function(){ ctrl.abort(); }, IDLE_MS); }
+
+    var acc = "", sources = [], nRefs = 0, aiRow = null, ansEl = null;
+    function ensureBubble(){
+      if (aiRow) return;
+      loader.remove();
+      aiRow = document.createElement("div");
+      aiRow.className = "row ai";
+      aiRow.innerHTML = '<div class="avatar" aria-hidden="true">' + AI_SVG + '</div>' +
+        '<div class="bubble"><div class="ans"></div></div>';
+      aiRow.addEventListener("click", function(e){
+        var cite = e.target.closest(".cite");
+        if (cite){ openRef(aiRow, cite.getAttribute("data-n")); return; }
+        var head = e.target.closest(".ref-head");
+        if (head){ head.parentElement.classList.toggle("open"); }
+      });
+      thread.appendChild(aiRow);
+      ansEl = aiRow.querySelector(".ans");
+    }
+
+    try {
+      var r = await fetch(API + "/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+        signal: ctrl.signal
+      });
+      if (!r.ok || !r.body) throw new Error("HTTP " + r.status);
+
+      var reader = r.body.getReader();
+      var dec = new TextDecoder();
+      var buf = "";
+      while (true){
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        bump();
+        buf += dec.decode(chunk.value, { stream: true });
+        var lines = buf.split("\n");
+        buf = lines.pop();                       // 마지막(미완성) 조각은 보관
+        for (var li = 0; li < lines.length; li++){
+          var line = lines[li].trim();
+          if (!line) continue;
+          var ev; try { ev = JSON.parse(line); } catch(_){ continue; }
+          if (ev.type === "sources"){
+            sources = ev.sources || []; nRefs = sources.length;
+          } else if (ev.type === "token"){
+            ensureBubble();
+            acc += ev.text || "";
+            ansEl.innerHTML = renderAnswerHTML(acc, nRefs);
+            toBottom();
+          } else if (ev.type === "error"){
+            throw new Error(ev.message || "서버 오류");
+          }
+        }
+      }
+      clearTimeout(idle);
+
+      if (!aiRow){ ensureBubble(); ansEl.textContent = "답변을 받지 못했어요."; }
+      else { ansEl.innerHTML = renderAnswerHTML(acc, nRefs); }
+      if (nRefs) aiRow.querySelector(".bubble").insertAdjacentHTML("beforeend", renderRefs(sources));
+      statusEl.className = "status on"; statusText.textContent = "연결됨";
+      toBottom();
+    } catch (e){
+      clearTimeout(idle);
+      if (!aiRow) loader.remove();
+      if (e.name === "AbortError")
+        addError("응답이 지연되고 있어요. CPU로 동작 중이라 답변 생성이 오래 걸릴 수 있어요. 잠시 후 다시 시도해 주세요.");
+      else {
+        addError("서버에 연결하지 못했어요. 챗봇 서버가 켜져 있는지 확인해 주세요.");
+        statusEl.className = "status off"; statusText.textContent = "연결 끊김";
+      }
+    } finally {
+      setBusy(false); input.focus();
+    }
+  }
+
+  // 입력 자동 높이 + 버튼 활성화
+  input.addEventListener("input", function(){
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 160) + "px";
+    sendBtn.disabled = busy || input.value.trim() === "";
+  });
+  input.addEventListener("keydown", function(e){
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); send(input.value); }
+  });
+  sendBtn.addEventListener("click", function(){ send(input.value); });
+  document.getElementById("chips").addEventListener("click", function(e){
+    var b = e.target.closest(".chip"); if (b) send(b.textContent);
+  });
+
+  health();
+  setInterval(function(){ if (!busy) health(); }, 30000);
+  input.focus();
+})();
+</script>
+</body>
+</html>

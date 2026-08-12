@@ -1,0 +1,30 @@
+# ===== 비밀/환경 (절대 커밋 금지) =====
+.env
+*.key
+*.pem
+
+# ===== 파이썬 =====
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# ===== 데이터·인덱스·로그 (대용량/런타임 생성물) =====
+vectorstore.db
+*.lock
+*.log
+
+# ===== 대용량 바이너리/배포 패키지 =====
+*.zip
+db/mysql-*/          # MySQL 포터블 바이너리
+db/data/             # MySQL 데이터 디렉토리
+models/              # Ollama 모델 blobs
+offline/             # 오프라인 설치 스테이징
+offline_windows/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# db/*.sql (스키마·데이터 덤프)는 커밋 대상이므로 무시하지 않음

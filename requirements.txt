@@ -1,0 +1,23 @@
+# --- HTTP API (사내 프로그램이 호출할 챗봇 서버) ---
+fastapi
+uvicorn[standard]
+
+# --- 설정/유틸 ---
+pydantic
+pydantic-settings
+pyyaml
+httpx
+
+# --- DB 커넥터 ---
+oracledb          # Oracle. thin 모드 = Oracle Instant Client 설치 불필요(순수 파이썬)
+pymysql           # MySQL
+
+# --- 벡터 검색 (RAG 색인 저장; 네이티브 의존성 없는 경량 구성) ---
+numpy
+
+# --- MCP 서버 (Oracle/MySQL 도구 노출) ---
+mcp[cli]
+
+# --- 뉴스 RSS 수집: 기사 HTML 본문 파싱 + 사내 SSL검사 프록시 대응(OS 신뢰저장소) ---
+beautifulsoup4
+truststore

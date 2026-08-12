@@ -1,0 +1,107 @@
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `dart_fin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dart_fin` (
+  `CORP_CODE` varchar(8) NOT NULL,
+  `CORP_NM` varchar(100) DEFAULT NULL,
+  `BSNS_YEAR` varchar(4) NOT NULL,
+  `REPRT_CODE` varchar(5) NOT NULL,
+  `REPRT_NM` varchar(30) DEFAULT NULL,
+  `FS_DIV` varchar(3) NOT NULL,
+  `SJ_DIV` varchar(10) NOT NULL,
+  `SJ_NM` varchar(60) DEFAULT NULL,
+  `ACCOUNT_ID` varchar(120) DEFAULT NULL,
+  `ACCOUNT_NM` varchar(200) DEFAULT NULL,
+  `THSTRM_NM` varchar(40) DEFAULT NULL,
+  `THSTRM_AMOUNT` decimal(30,0) DEFAULT NULL,
+  `THSTRM_ADD_AMOUNT` decimal(30,0) DEFAULT NULL,
+  `FRMTRM_NM` varchar(40) DEFAULT NULL,
+  `FRMTRM_AMOUNT` decimal(30,0) DEFAULT NULL,
+  `ORD` int NOT NULL,
+  `CURRENCY` varchar(10) DEFAULT NULL,
+  `RCEPT_NO` varchar(14) DEFAULT NULL,
+  `FETCHED_AT` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`CORP_CODE`,`BSNS_YEAR`,`REPRT_CODE`,`FS_DIV`,`SJ_DIV`,`ORD`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `mms_test_tb`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mms_test_tb` (
+  `MSG_ID` int NOT NULL AUTO_INCREMENT,
+  `MSG_TITLE` varchar(200) DEFAULT NULL,
+  `MSG_CONTENT` text,
+  `MSG_TYPE` varchar(20) DEFAULT NULL,
+  `SENDER_DEPT` varchar(50) DEFAULT NULL,
+  `RECIPIENT_GROUP` varchar(50) DEFAULT NULL,
+  `STATUS` varchar(20) DEFAULT NULL,
+  `PRIORITY` int DEFAULT NULL,
+  `SEND_DATE` date DEFAULT NULL,
+  `USE_YN` char(1) DEFAULT NULL,
+  PRIMARY KEY (`MSG_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `news_rss`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `news_rss` (
+  `NEWS_ID` varchar(64) NOT NULL,
+  `SOURCE` varchar(100) DEFAULT NULL,
+  `TITLE` varchar(500) DEFAULT NULL,
+  `LINK` varchar(1000) DEFAULT NULL,
+  `CATEGORY` varchar(100) DEFAULT NULL,
+  `AUTHOR` varchar(100) DEFAULT NULL,
+  `PUB_DATE` varchar(64) DEFAULT NULL,
+  `SUMMARY` text,
+  `CONTENT` mediumtext,
+  `FETCHED_AT` datetime DEFAULT CURRENT_TIMESTAMP,
+  `INDEXED_YN` char(1) DEFAULT 'N',
+  PRIMARY KEY (`NEWS_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `stock_price`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stock_price` (
+  `BAS_DT` varchar(8) NOT NULL,
+  `SRTN_CD` varchar(12) NOT NULL,
+  `ISIN_CD` varchar(12) DEFAULT NULL,
+  `ITMS_NM` varchar(120) DEFAULT NULL,
+  `MRKT_CTG` varchar(20) DEFAULT NULL,
+  `CLPR` bigint DEFAULT NULL,
+  `VS` bigint DEFAULT NULL,
+  `FLT_RT` decimal(10,2) DEFAULT NULL,
+  `MKP` bigint DEFAULT NULL,
+  `HIPR` bigint DEFAULT NULL,
+  `LOPR` bigint DEFAULT NULL,
+  `TRQU` bigint DEFAULT NULL,
+  `TR_PRC` bigint DEFAULT NULL,
+  `LSTG_ST_CNT` bigint DEFAULT NULL,
+  `MRKT_TOT_AMT` bigint DEFAULT NULL,
+  `FETCHED_AT` datetime DEFAULT CURRENT_TIMESTAMP,
+  `INDEXED_YN` char(1) DEFAULT 'N',
+  PRIMARY KEY (`BAS_DT`,`SRTN_CD`),
+  KEY `idx_nm` (`ITMS_NM`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+

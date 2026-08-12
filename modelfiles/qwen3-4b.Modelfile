@@ -1,0 +1,11 @@
+FROM C:/Users/user/Desktop/claude/llm/models/Qwen3-4B-Q4_K_M.gguf
+
+# 컨텍스트 길이: RAG 검색 결과 + 질문 + 답변을 담을 여유.
+# CPU/RAM(16GB) 여건을 고려해 8192로 설정 (필요 시 API 호출에서 num_ctx로 조정 가능).
+PARAMETER num_ctx 8192
+
+# Qwen3 권장 샘플링 값 (non-thinking 기준)
+PARAMETER temperature 0.7
+PARAMETER top_p 0.8
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.05

@@ -1,0 +1,56 @@
+# =========================================================
+#  사내 RAG 챗봇 설정
+#  ★ 민감정보(개인정보/결제정보)가 없는 테이블/뷰만 등록하세요.
+#  ★ DB 접속 비밀번호 등은 여기 두지 말고 .env 파일에 두세요.
+# =========================================================
+
+ollama:
+  base_url: "http://localhost:11434"
+  chat_model: "qwen3-news"   # 뉴스 분석 전용(Modelfile SYSTEM+ChatML). 원본은 qwen3-4b
+  embedding_model: "qwen3-embedding"
+  num_ctx: 8192          # 뉴스 다건 분석용 컨텍스트 여유 (num_ctx=4096 이면 메모리 절약)
+  think: false          # Qwen3 사고(thinking) 모드 off → CPU 속도 우선
+  keep_alive: "30m"     # 채팅 모델을 메모리에 유지 → 콜드 로딩(약 60초) 제거. "-1"=무제한, "0"=즉시 해제
+
+retrieval:
+  top_k: 5              # 질문당 가져올 문서 조각 수
+  chunk_size: 800       # 텍스트 조각 최대 글자 수
+  chunk_overlap: 100
+
+vector_store:
+  path: "./vectorstore.db"   # 벡터 저장 파일 (rag/ 기준 상대경로, SQLite)
+  collection: "company_kb"
+
+# ---------------------------------------------------------
+#  DB별 색인 대상 (★ 민감정보 없는 테이블/뷰만 ★)
+#  각 항목 의미:
+#    table        : 대상 테이블/뷰 이름
+#    id_column    : 각 행의 고유 식별자 컬럼 (출처 표기에 사용)
+#    text_columns : 임베딩할 텍스트 컬럼들 (딱 이 컬럼들만 읽습니다)
+#    where        : (선택) 추가 조건. 예) "USE_YN = 'Y'"  없으면 null
+# ---------------------------------------------------------
+sources:
+  oracle:
+    enabled: false          # DB 준비되면 true 로 변경
+    tables:
+      - table: "KB_FAQ"
+        id_column: "FAQ_ID"
+        text_columns: ["TITLE", "CONTENT"]
+        where: null
+      # - table: "PRODUCT_GUIDE"
+      #   id_column: "GUIDE_ID"
+      #   text_columns: ["NAME", "DESCRIPTION"]
+      #   where: "USE_YN = 'Y'"
+
+  mysql:
+    enabled: true
+    tables:
+      - table: "MMS_TEST_TB"
+        id_column: "MSG_ID"
+        text_columns: ["MSG_TITLE", "MSG_CONTENT"]
+        where: null
+      # 뉴스 RSS 수집 테이블 (app.ingest_rss 가 채움). 전체 reindex 시에도 색인됨.
+      - table: "NEWS_RSS"
+        id_column: "NEWS_ID"
+        text_columns: ["TITLE", "SUMMARY", "CONTENT"]
+        where: null
